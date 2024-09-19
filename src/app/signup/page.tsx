@@ -1,29 +1,29 @@
 // src/app/signup/page.tsx
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { supabase } from '../../lib/supabase'
-import { useRouter } from 'next/navigation'
+import React, { useState } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useRouter } from 'next/navigation';
 
 export default function Signup() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const router = useRouter()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const router = useRouter();
 
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!supabase) {
-      console.error('Supabase client is not initialized')
-      return
+      console.error('Supabase client is not initialized');
+      return;
     }
-    const { error } = await supabase.auth.signUp({ email, password })
+    const { error } = await supabase.auth.signUp({ email, password });
     if (error) {
-      alert(error.message)
+      alert(error.message);
     } else {
-      alert('Check your email for the confirmation link!')
-      router.push('/login')
+      alert('Check your email for the confirmation link!');
+      router.push('/login');
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSignup}>
@@ -43,5 +43,5 @@ export default function Signup() {
       />
       <button type="submit">Sign Up</button>
     </form>
-  )
+  );
 }

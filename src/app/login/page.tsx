@@ -1,28 +1,31 @@
 // src/app/login/page.tsx
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { supabase } from '../../lib/supabase'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const router = useRouter()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!supabase) {
-      console.error('Supabase client is not initialized')
-      return
+      console.error('Supabase client is not initialized');
+      return;
     }
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     if (error) {
-      alert(error.message)
+      alert(error.message);
     } else {
-      router.push('/dashboard')
+      router.push('/dashboard');
     }
-  }
+  };
 
   return (
     <form onSubmit={handleLogin}>
@@ -42,5 +45,5 @@ export default function Login() {
       />
       <button type="submit">Log In</button>
     </form>
-  )
+  );
 }
