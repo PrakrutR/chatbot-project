@@ -1,5 +1,6 @@
 // src/app/signup/page.tsx
 'use client'
+
 import React, { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
@@ -11,6 +12,10 @@ export default function Signup() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!supabase) {
+      console.error('Supabase client is not initialized')
+      return
+    }
     const { error } = await supabase.auth.signUp({ email, password })
     if (error) {
       alert(error.message)
