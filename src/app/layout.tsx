@@ -1,5 +1,5 @@
 // src/app/layout.tsx
-import { AuthProvider } from '../contexts/AuthContext'
+import { AuthProvider } from '../components/AuthProvider'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
