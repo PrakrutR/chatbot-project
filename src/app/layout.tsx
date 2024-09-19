@@ -1,6 +1,5 @@
 // src/app/layout.tsx
 import { AuthProvider } from '../components/AuthProvider'
-import ErrorBoundary from '../components/ErrorBoundary'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -16,9 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ErrorBoundary>
-          <AuthProvider>{children}</AuthProvider>
-        </ErrorBoundary>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   )
