@@ -8,10 +8,10 @@ if (typeof window !== 'undefined') {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase environment variables')
+    console.error('Missing Supabase environment variables')
+  } else {
+    supabase = createClient(supabaseUrl, supabaseAnonKey)
   }
-
-  supabase = createClient(supabaseUrl, supabaseAnonKey)
 }
 
 export { supabase }

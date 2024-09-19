@@ -1,10 +1,9 @@
 // src/app/login/page.tsx
 'use client'
+
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
-
-export const dynamic = 'force-dynamic'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -13,6 +12,10 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!supabase) {
+      console.error('Supabase client is not initialized')
+      return
+    }
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       alert(error.message)
