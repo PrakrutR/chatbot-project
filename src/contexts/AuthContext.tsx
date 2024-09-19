@@ -1,5 +1,5 @@
 // src/contexts/AuthContext.tsx
-import { createContext } from 'react'
+import { createContext, useContext } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 
 type AuthContextType = {
