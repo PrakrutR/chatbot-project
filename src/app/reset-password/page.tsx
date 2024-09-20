@@ -19,6 +19,11 @@ export default function ResetPassword() {
   useEffect(() => {
     // Check if the user is authenticated (i.e., came from a valid reset link)
     const checkSession = async () => {
+      if (!supabase) {
+        console.error('Supabase client is not initialized');
+        router.push('/login');
+        return;
+      }
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -37,6 +42,13 @@ export default function ResetPassword() {
 
     if (password !== confirmPassword) {
       setError("Passwords don't match");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!supabase) {
+      console.error('Supabase client is not initialized');
+      setError('An error occurred. Please try again later.');
       setIsLoading(false);
       return;
     }
