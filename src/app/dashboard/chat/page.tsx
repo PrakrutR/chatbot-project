@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import Image from 'next/image';
 import { FaPaperPlane, FaSpinner } from 'react-icons/fa';
 
 interface Message {
