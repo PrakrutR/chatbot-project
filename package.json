@@ -10,6 +10,7 @@
     "format": "npx prettier --write ."
   },
   "dependencies": {
+    "@marsidev/react-turnstile": "^1.0.2",
     "@supabase/supabase-js": "^2.45.4",
     "next": "14.2.12",
     "react": "^18",
