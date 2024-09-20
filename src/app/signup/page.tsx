@@ -9,10 +9,10 @@ import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const passwordStrengthText = ['Weak', 'Fair', 'Good', 'Strong'];
 const passwordStrengthColor = [
-  'passwordStrength-weak',
-  'passwordStrength-fair',
-  'passwordStrength-good',
-  'passwordStrength-strong',
+  'bg-red-500',
+  'bg-orange-500',
+  'bg-yellow-500',
+  'bg-green-500',
 ];
 
 export default function Signup() {
@@ -36,7 +36,7 @@ export default function Signup() {
     if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
     if (/\d/.test(password)) strength++;
     if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
-    setPasswordStrength(strength);
+    setPasswordStrength(strength > 0 ? strength - 1 : 0); // Adjust to 0-3 range
   };
 
   const validatePassword = (password: string) => {
@@ -182,20 +182,22 @@ export default function Signup() {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
-            <div className="mt-2">
-              <div className="flex justify-between mb-1">
-                <div className="text-xs">
-                  {passwordStrengthText[passwordStrength]}
+            {password && (
+              <div className="mt-2">
+                <div className="flex justify-between mb-1">
+                  <div className="text-xs">
+                    {passwordStrengthText[passwordStrength]}
+                  </div>
+                  <div className="text-xs">Password Strength</div>
                 </div>
-                <div className="text-xs">Password Strength</div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className={`${passwordStrengthColor[passwordStrength]} h-2.5 rounded-full transition-all duration-300`}
+                    style={{ width: `${(passwordStrength + 1) * 25}%` }}
+                  ></div>
+                </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div
-                  className={`bg-${passwordStrengthColor[passwordStrength]} h-2.5 rounded-full`}
-                  style={{ width: `${(passwordStrength + 1) * 25}%` }}
-                ></div>
-              </div>
-            </div>
+            )}
           </div>
           <div className="mb-6">
             <label
