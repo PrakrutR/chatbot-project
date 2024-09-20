@@ -1,5 +1,5 @@
 // tailwind.config.js
-const colors = require('tailwindcss/colors')
+const colors = require('tailwindcss/colors');
 
 module.exports = {
   content: [
@@ -15,15 +15,15 @@ module.exports = {
           light: '#2a2a2a',
         },
         primary: {
-          DEFAULT: '#e57373',  // A warm, muted red
+          DEFAULT: '#e57373', // A warm, muted red
           hover: '#ef9a9a',
         },
         secondary: {
-          DEFAULT: '#81c784',  // A soft green
+          DEFAULT: '#81c784', // A soft green
           hover: '#a5d6a7',
         },
         accent: {
-          DEFAULT: '#ffb74d',  // A warm orange
+          DEFAULT: '#ffb74d', // A warm orange
           hover: '#ffcc80',
         },
         text: {
@@ -37,4 +37,4 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};
