@@ -1,6 +1,9 @@
 // src/app/layout.tsx
-import { AuthProvider } from '../components/AuthProvider';
-import { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import type { Metadata } from 'next';
+import './globals.css';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'AI Chatbot',
@@ -14,8 +17,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <AuthProvider>{children}</AuthProvider>
+      <body className={`${inter.className} bg-background text-text-primary`}>
+        {children}
       </body>
     </html>
   );

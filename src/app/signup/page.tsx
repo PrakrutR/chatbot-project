@@ -1,9 +1,10 @@
 // src/app/signup/page.tsx
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useRouter } from 'next/navigation';
+import Layout from '../../components/Layout';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -35,29 +36,49 @@ export default function Signup() {
       setMessage('An account with this email already exists.');
     } else {
       setMessage('Check your email for the confirmation link!');
-      // Optionally, you can redirect to a "verify your email" page instead
-      // router.push('/verify-email')
+      // Redirect to login page after successful signup
+      setTimeout(() => router.push('/login'), 3000);
     }
   };
 
   return (
-    <form onSubmit={handleSignup}>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-        required
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        required
-      />
-      <button type="submit">Sign Up</button>
-      {message && <p>{message}</p>}
-    </form>
+    <Layout>
+      <h1 className="text-3xl font-bold text-primary mb-6">Sign Up</h1>
+      <form onSubmit={handleSignup} className="space-y-6 max-w-md">
+        <div>
+          <label htmlFor="email" className="block text-text-secondary mb-2">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-3 py-2 bg-background-light border border-text-secondary rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-text-primary"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className="block text-text-secondary mb-2">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-3 py-2 bg-background-light border border-text-secondary rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-text-primary"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-secondary text-background px-6 py-3 rounded-md hover:bg-secondary-hover transition-colors font-semibold"
+        >
+          Sign Up
+        </button>
+        {message && <p className="text-accent mt-4">{message}</p>}
+      </form>
+    </Layout>
   );
 }
