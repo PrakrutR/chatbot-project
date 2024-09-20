@@ -1,0 +1,146 @@
+// src/app/dashboard/chat/page.tsx
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import Image from 'next/image';
+import { FaPaperPlane, FaSpinner } from 'react-icons/fa';
+
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+export default function ChatPage() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      loadMessages();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const loadMessages = async () => {
+    if (!supabase) return;
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('user_id', user?.id)
+      .order('timestamp', { ascending: true });
+
+    if (error) {
+      console.error('Error loading messages:', error);
+    } else {
+      setMessages(data || []);
+    }
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputMessage.trim() || !user || !supabase) return;
+
+    setIsLoading(true);
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: inputMessage.trim(),
+      timestamp: new Date(),
+    };
+
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setInputMessage('');
+
+    // TODO: Implement actual API call to AI model here
+    // For now, we'll just simulate a response
+    setTimeout(() => {
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `I received your message: "${inputMessage.trim()}"`,
+        timestamp: new Date(),
+      };
+      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+      setIsLoading(false);
+    }, 1000);
+
+    // Save messages to Supabase
+    await supabase.from('messages').insert([
+      {
+        user_id: user.id,
+        role: newMessage.role,
+        content: newMessage.content,
+        timestamp: newMessage.timestamp,
+      },
+    ]);
+  };
+
+  return (
+    <ProtectedRoute>
+      <div className="flex flex-col h-screen bg-background">
+        <header className="bg-primary text-secondary p-4">
+          <h1 className="text-2xl font-bold">AI Chatbot</h1>
+        </header>
+        <div className="flex-1 overflow-y-auto p-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`mb-4 ${
+                message.role === 'user' ? 'text-right' : 'text-left'
+              }`}
+            >
+              <div
+                className={`inline-block p-2 rounded-lg ${
+                  message.role === 'user'
+                    ? 'bg-primary text-secondary'
+                    : 'bg-secondary text-text-primary'
+                }`}
+              >
+                {message.content}
+              </div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+        <form onSubmit={handleSendMessage} className="p-4 bg-background-alt">
+          <div className="flex items-center">
+            <input
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Type your message here..."
+              className="flex-1 p-2 rounded-l-lg border border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+              disabled={isLoading}
+            />
+            <button
+              type="submit"
+              className="bg-primary text-secondary p-2 rounded-r-lg hover:bg-primary-dark transition-colors"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <FaSpinner className="animate-spin" />
+              ) : (
+                <FaPaperPlane />
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </ProtectedRoute>
+  );
+}

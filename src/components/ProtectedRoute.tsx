@@ -13,8 +13,12 @@ export default function ProtectedRoute({
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
+    if (!loading) {
+      if (!user) {
+        router.push('/login');
+      } else if (window.location.pathname === '/dashboard') {
+        router.push('/dashboard/chat');
+      }
     }
   }, [user, loading, router]);
 
