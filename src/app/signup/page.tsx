@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -26,7 +25,6 @@ export default function Signup() {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const router = useRouter();
 
   useEffect(() => {
     checkPasswordStrength(password);
@@ -88,6 +86,11 @@ export default function Signup() {
       setError(error.message);
     } else if (data?.user) {
       setMessage('Check your email for the confirmation link!');
+      // Clear the form
+      setDisplayName('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
     }
 
     setIsLoading(false);
