@@ -1,12 +1,20 @@
 // src/app/signup/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+
+const passwordStrengthText = ['Weak', 'Fair', 'Good', 'Strong'];
+const passwordStrengthColor = [
+  'passwordStrength-weak',
+  'passwordStrength-fair',
+  'passwordStrength-good',
+  'passwordStrength-strong',
+];
 
 export default function Signup() {
   const [displayName, setDisplayName] = useState('');
@@ -15,16 +23,46 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const router = useRouter();
+
+  useEffect(() => {
+    checkPasswordStrength(password);
+  }, [password]);
+
+  const checkPasswordStrength = (password: string) => {
+    let strength = 0;
+    if (password.length >= 6) strength++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+    setPasswordStrength(strength);
+  };
+
+  const validatePassword = (password: string) => {
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,}$/;
+    return regex.test(password);
+  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setMessage('');
     setIsLoading(true);
 
     if (password !== confirmPassword) {
       setError("Passwords don't match");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError(
+        'Password must be at least 6 characters long and contain lowercase and uppercase letters, digits, and symbols'
+      );
       setIsLoading(false);
       return;
     }
@@ -49,8 +87,7 @@ export default function Signup() {
     if (error) {
       setError(error.message);
     } else if (data?.user) {
-      alert('Check your email for the confirmation link!');
-      router.push('/login');
+      setMessage('Check your email for the confirmation link!');
     }
 
     setIsLoading(false);
@@ -142,6 +179,20 @@ export default function Signup() {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
+            <div className="mt-2">
+              <div className="flex justify-between mb-1">
+                <div className="text-xs">
+                  {passwordStrengthText[passwordStrength]}
+                </div>
+                <div className="text-xs">Password Strength</div>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className={`bg-${passwordStrengthColor[passwordStrength]} h-2.5 rounded-full`}
+                  style={{ width: `${(passwordStrength + 1) * 25}%` }}
+                ></div>
+              </div>
+            </div>
           </div>
           <div className="mb-6">
             <label
@@ -164,6 +215,9 @@ export default function Signup() {
             </div>
           </div>
           {error && <p className="text-accent text-xs italic mb-4">{error}</p>}
+          {message && (
+            <p className="text-green-500 text-xs italic mb-4">{message}</p>
+          )}
           <div className="flex items-center justify-between mb-6">
             <button
               className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"

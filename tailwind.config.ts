@@ -1,7 +1,8 @@
-// tailwind.config.js
+// tailwind.config.ts
+import type { Config } from 'tailwindcss';
 const colors = require('tailwindcss/colors');
 
-module.exports = {
+const config: Config = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -33,6 +34,13 @@ module.exports = {
           DEFAULT: '#FFFFFF',
           alt: '#F5F5F5',
         },
+        // Add these for password strength indicator
+        passwordStrength: {
+          weak: colors.red[500],
+          fair: colors.orange[500],
+          good: colors.yellow[500],
+          strong: colors.green[500],
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -41,3 +49,5 @@ module.exports = {
   },
   plugins: [],
 };
+
+export default config;
