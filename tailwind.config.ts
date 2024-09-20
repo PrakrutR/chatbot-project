@@ -1,5 +1,5 @@
 // tailwind.config.js
-const colors = require('tailwindcss/colors');
+const colors = require('tailwindcss/colors')
 
 module.exports = {
   content: [
@@ -10,25 +10,28 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: {
-          DEFAULT: '#1a1a1a',
-          light: '#2a2a2a',
-        },
         primary: {
-          DEFAULT: '#e57373', // A warm, muted red
-          hover: '#ef9a9a',
+          DEFAULT: '#009688',
+          light: '#4DB6AC',
+          dark: '#00796B',
         },
         secondary: {
-          DEFAULT: '#81c784', // A soft green
-          hover: '#a5d6a7',
+          DEFAULT: '#FFF3E0',
+          light: '#FFFAF3',
+          dark: '#FFE0B2',
         },
         accent: {
-          DEFAULT: '#ffb74d', // A warm orange
-          hover: '#ffcc80',
+          DEFAULT: '#FF5722',
+          light: '#FF8A65',
+          dark: '#E64A19',
         },
         text: {
-          primary: '#f5f5f5',
-          secondary: '#bdbdbd',
+          primary: '#212121',
+          secondary: '#757575',
+        },
+        background: {
+          DEFAULT: '#FFFFFF',
+          alt: '#F5F5F5',
         },
       },
       fontFamily: {
@@ -37,4 +40,4 @@ module.exports = {
     },
   },
   plugins: [],
-};
+}
