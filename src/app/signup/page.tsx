@@ -59,6 +59,23 @@ export default function Signup() {
       return;
     }
 
+    const verificationResponse = await fetch('/api/verify-turnstile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token: captchaToken }),
+    });
+
+    const verificationResult = await verificationResponse.json();
+
+    if (!verificationResult.success) {
+      setError('Captcha verification failed. Please try again.');
+      setIsLoading(false);
+      return;
+    }
+
+    // Proceed with signup logic
     if (password !== confirmPassword) {
       setError("Passwords don't match");
       setIsLoading(false);
@@ -87,7 +104,6 @@ export default function Signup() {
         data: {
           display_name: displayName,
         },
-        captchaToken: captchaToken,
       },
     });
 
@@ -232,7 +248,7 @@ export default function Signup() {
           {message && (
             <p className="text-green-500 text-xs italic mb-4">{message}</p>
           )}
-          <div className="mb-6">
+          <div className="bg-secondary rounded-lg shadow-inner">
             <TurnstileComponent onVerify={(token) => setCaptchaToken(token)} />
           </div>
 

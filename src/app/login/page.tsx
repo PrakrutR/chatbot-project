@@ -135,7 +135,7 @@ export default function Login() {
             </div>
           </div>
           {error && <p className="text-accent text-xs italic mb-4">{error}</p>}
-          <div className="mb-6">
+          <div className="bg-secondary rounded-lg shadow-inner">
             <TurnstileComponent onVerify={(token) => setCaptchaToken(token)} />
           </div>
           {error && <p className="text-accent text-xs italic mb-4">{error}</p>}
