@@ -1,18 +1,27 @@
 // src/components/Turnstile.tsx
 'use client';
 
-import { Turnstile } from '@marsidev/react-turnstile';
+import { Turnstile, TurnstileProps } from '@marsidev/react-turnstile';
 
-interface TurnstileProps {
+interface ExtendedTurnstileProps extends TurnstileProps {
   onVerify: (token: string) => void;
+  containerClassName?: string;
 }
 
-const TurnstileComponent: React.FC<TurnstileProps> = ({ onVerify }) => {
+const TurnstileComponent: React.FC<ExtendedTurnstileProps> = ({
+  onVerify,
+  containerClassName,
+  siteKey,
+  ...turnstileProps
+}) => {
   return (
-    <Turnstile
-      siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY!}
-      onSuccess={onVerify}
-    />
+    <div className={`flex justify-center ${containerClassName || ''}`}>
+      <Turnstile
+        siteKey={siteKey || process.env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY!}
+        onSuccess={onVerify}
+        {...turnstileProps}
+      />
+    </div>
   );
 };
 
