@@ -248,10 +248,9 @@ export default function Signup() {
           {message && (
             <p className="text-green-500 text-xs italic mb-4">{message}</p>
           )}
-          <div className="mb-6">
+          <div className="bg-secondary rounded-lg shadow-inner">
             <TurnstileComponent
               onVerify={(token) => setCaptchaToken(token)}
-              containerClassName="turnstile-container"
               siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY!}
             />
           </div>
