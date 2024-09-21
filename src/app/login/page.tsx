@@ -54,7 +54,7 @@ export default function Login() {
         throw error;
       }
 
-      router.push('/dashboard');
+      router.push('/dashboard/chat');
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'An unexpected error occurred';
