@@ -1,70 +1,17 @@
-// src/components/AuthProvider.tsx
+// src/app/dashboard/chat/page.tsx
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 
-type AuthContextType = {
-  user: User | null;
-  session: Session | null;
-  loading: boolean;
-};
-
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  session: null,
-  loading: true,
+const DynamicChatContent = dynamic(() => import('@/components/ChatContent'), {
+  ssr: false,
 });
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const setData = async () => {
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-        if (error) throw error;
-        setSession(session);
-        setUser(session?.user ?? null);
-      } catch (error) {
-        console.error('Error getting auth session:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      (_event: AuthChangeEvent, session: Session | null) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    setData();
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
+export default function ChatPage() {
   return (
-    <AuthContext.Provider value={{ user, session, loading }}>
-      {children}
-    </AuthContext.Provider>
+    <Suspense fallback={<div>Loading...</div>}>
+      <DynamicChatContent />
+    </Suspense>
   );
-};
-
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+}

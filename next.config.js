@@ -1,6 +1,7 @@
 // next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
   async redirects() {
     return [
       {
@@ -9,6 +10,10 @@ const nextConfig = {
         permanent: false,
       },
     ];
+  },
+  // Add this configuration to exclude the chat page from static generation
+  experimental: {
+    excludePages: ['/dashboard/chat'],
   },
 };
 
