@@ -42,13 +42,17 @@ export default function ChatPage() {
     }
   }, [user, loadMessages]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMessage.trim() || !user || !supabase) return;
+    if (!inputMessage.trim() || !user) return;
 
     setIsLoading(true);
     const newMessage: Message = {
