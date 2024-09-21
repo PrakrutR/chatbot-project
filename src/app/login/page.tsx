@@ -135,8 +135,11 @@ export default function Login() {
             </div>
           </div>
           {error && <p className="text-accent text-xs italic mb-4">{error}</p>}
-          <div className="bg-secondary rounded-lg shadow-inner">
-            <TurnstileComponent onVerify={(token) => setCaptchaToken(token)} />
+          <div className="mb-6">
+            <TurnstileComponent
+              onVerify={(token) => setCaptchaToken(token)}
+              containerClassName="bg-secondary rounded-lg shadow-inner"
+            />
           </div>
           {error && <p className="text-accent text-xs italic mb-4">{error}</p>}
           <div className="flex items-center justify-between mb-6">
