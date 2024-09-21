@@ -1,7 +1,7 @@
 // src/app/signup/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -27,6 +27,7 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const turnstileRef = useRef<any>(null);
 
   useEffect(() => {
     checkPasswordStrength(password);
@@ -47,6 +48,13 @@ export default function Signup() {
     return regex.test(password);
   };
 
+  const resetCaptcha = () => {
+    if (turnstileRef.current && turnstileRef.current.reset) {
+      turnstileRef.current.reset();
+    }
+    setCaptchaToken(null);
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -59,26 +67,10 @@ export default function Signup() {
       return;
     }
 
-    const verificationResponse = await fetch('/api/verify-turnstile', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ token: captchaToken }),
-    });
-
-    const verificationResult = await verificationResponse.json();
-
-    if (!verificationResult.success) {
-      setError('Captcha verification failed. Please try again.');
-      setIsLoading(false);
-      return;
-    }
-
-    // Proceed with signup logic
     if (password !== confirmPassword) {
       setError("Passwords don't match");
       setIsLoading(false);
+      resetCaptcha();
       return;
     }
 
@@ -87,38 +79,44 @@ export default function Signup() {
         'Password must be at least 6 characters long and contain lowercase and uppercase letters, digits, and symbols'
       );
       setIsLoading(false);
+      resetCaptcha();
       return;
     }
 
-    if (!supabase) {
-      console.error('Supabase client is not initialized');
-      setError('An error occurred. Please try again later.');
-      setIsLoading(false);
-      return;
-    }
+    try {
+      if (!supabase) {
+        throw new Error('Supabase client is not initialized');
+      }
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          display_name: displayName,
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          captchaToken: captchaToken,
+          data: {
+            display_name: displayName,
+          },
         },
-      },
-    });
+      });
 
-    if (error) {
-      setError(error.message);
-    } else if (data?.user) {
-      setMessage('Check your email for the confirmation link!');
-      // Clear the form
-      setDisplayName('');
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
+      if (error) {
+        throw error;
+      }
+
+      if (data?.user) {
+        setMessage('Check your email for the confirmation link!');
+        // Clear the form
+        setDisplayName('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+      }
+    } catch (error: any) {
+      setError(error.message || 'An unexpected error occurred');
+      resetCaptcha();
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -250,20 +248,16 @@ export default function Signup() {
           )}
           <div className="mb-6">
             <TurnstileComponent
-              onVerify={(token) => setCaptchaToken(token)}
-              containerClassName="bg-secondary rounded-lg shadow-inner"
+              ref={turnstileRef}
+              onVerify={(token: string) => setCaptchaToken(token)}
+              containerClassName="bg-white rounded-lg shadow-inner"
             />
           </div>
-          {error && <p className="text-accent text-xs italic mb-4">{error}</p>}
-          {message && (
-            <p className="text-green-500 text-xs italic mb-4">{message}</p>
-          )}
-
           <div className="flex items-center justify-between mb-6">
             <button
               className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !captchaToken}
             >
               {isLoading ? 'Signing up...' : 'Sign Up'}
             </button>

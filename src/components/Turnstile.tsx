@@ -1,19 +1,21 @@
 // src/components/Turnstile.tsx
-'use client';
-
 import { Turnstile } from '@marsidev/react-turnstile';
+import React, { forwardRef } from 'react';
 
 interface TurnstileComponentProps {
   onVerify: (token: string) => void;
   containerClassName?: string;
 }
 
-const TurnstileComponent: React.FC<TurnstileComponentProps> = ({
-  onVerify,
-  containerClassName,
-}) => {
+export const TurnstileComponent = forwardRef<
+  HTMLDivElement,
+  TurnstileComponentProps
+>(({ onVerify, containerClassName }, ref) => {
   return (
-    <div className={`flex justify-center ${containerClassName || ''}`}>
+    <div
+      ref={ref}
+      className={`flex justify-center ${containerClassName || ''}`}
+    >
       <Turnstile
         siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY!}
         onSuccess={onVerify}
@@ -24,6 +26,6 @@ const TurnstileComponent: React.FC<TurnstileComponentProps> = ({
       />
     </div>
   );
-};
+});
 
-export default TurnstileComponent;
+TurnstileComponent.displayName = 'TurnstileComponent';

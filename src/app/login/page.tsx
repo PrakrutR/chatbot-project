@@ -1,13 +1,13 @@
 // src/app/login/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
-import TurnstileComponent from '../../components/Turnstile';
+import { TurnstileComponent } from '../../components/Turnstile';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -17,6 +17,14 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const router = useRouter();
+  const turnstileRef = useRef<any>(null);
+
+  const resetCaptcha = () => {
+    if (turnstileRef.current && turnstileRef.current.reset) {
+      turnstileRef.current.reset();
+    }
+    setCaptchaToken(null);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,42 +37,30 @@ export default function Login() {
       return;
     }
 
-    const verificationResponse = await fetch('/api/verify-turnstile', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ token: captchaToken }),
-    });
+    try {
+      if (!supabase) {
+        throw new Error('Supabase client is not initialized');
+      }
 
-    const verificationResult = await verificationResponse.json();
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+        options: {
+          captchaToken: captchaToken,
+        },
+      });
 
-    if (!verificationResult.success) {
-      setError('Captcha verification failed. Please try again.');
-      setIsLoading(false);
-      return;
-    }
+      if (error) {
+        throw error;
+      }
 
-    if (!supabase) {
-      console.error('Supabase client is not initialized');
-      setIsLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-      options: {
-        captchaToken: captchaToken,
-      },
-    });
-
-    if (error) {
-      setError(error.message);
-    } else {
       router.push('/dashboard');
+    } catch (error: any) {
+      setError(error.message || 'An unexpected error occurred');
+      resetCaptcha();
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -137,16 +133,16 @@ export default function Login() {
           {error && <p className="text-accent text-xs italic mb-4">{error}</p>}
           <div className="mb-6">
             <TurnstileComponent
-              onVerify={(token) => setCaptchaToken(token)}
-              containerClassName="bg-secondary rounded-lg shadow-inner"
+              ref={turnstileRef}
+              onVerify={(token: string) => setCaptchaToken(token)}
+              containerClassName="bg-white rounded-lg shadow-inner"
             />
           </div>
-          {error && <p className="text-accent text-xs italic mb-4">{error}</p>}
           <div className="flex items-center justify-between mb-6">
             <button
               className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !captchaToken}
             >
               {isLoading ? 'Logging in...' : 'Log In'}
             </button>
