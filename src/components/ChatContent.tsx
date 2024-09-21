@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/components/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { FaPaperPlane, FaSpinner } from 'react-icons/fa';
 import AuthProvider from '@/components/AuthProvider';
