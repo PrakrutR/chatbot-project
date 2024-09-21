@@ -4,8 +4,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import ProtectedRoute from '@/components/ProtectedRoute';
 import { FaPaperPlane, FaSpinner } from 'react-icons/fa';
+import { AuthProvider } from '@/components/AuthProvider';
 
 interface Message {
   id: string;
@@ -14,7 +14,7 @@ interface Message {
   timestamp: Date;
 }
 
-export default function ChatPage() {
+function ChatPageContent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -90,56 +90,62 @@ export default function ChatPage() {
   };
 
   return (
-    <ProtectedRoute>
-      <div className="flex flex-col h-screen bg-background">
-        <header className="bg-primary text-secondary p-4">
-          <h1 className="text-2xl font-bold">AI Chatbot</h1>
-        </header>
-        <div className="flex-1 overflow-y-auto p-4">
-          {messages.map((message) => (
+    <div className="flex flex-col h-screen bg-background">
+      <header className="bg-primary text-secondary p-4">
+        <h1 className="text-2xl font-bold">AI Chatbot</h1>
+      </header>
+      <div className="flex-1 overflow-y-auto p-4">
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`mb-4 ${
+              message.role === 'user' ? 'text-right' : 'text-left'
+            }`}
+          >
             <div
-              key={message.id}
-              className={`mb-4 ${
-                message.role === 'user' ? 'text-right' : 'text-left'
+              className={`inline-block p-2 rounded-lg ${
+                message.role === 'user'
+                  ? 'bg-primary text-secondary'
+                  : 'bg-secondary text-text-primary'
               }`}
             >
-              <div
-                className={`inline-block p-2 rounded-lg ${
-                  message.role === 'user'
-                    ? 'bg-primary text-secondary'
-                    : 'bg-secondary text-text-primary'
-                }`}
-              >
-                {message.content}
-              </div>
+              {message.content}
             </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-        <form onSubmit={handleSendMessage} className="p-4 bg-background-alt">
-          <div className="flex items-center">
-            <input
-              type="text"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Type your message here..."
-              className="flex-1 p-2 rounded-l-lg border border-primary focus:outline-none focus:ring-2 focus:ring-primary"
-              disabled={isLoading}
-            />
-            <button
-              type="submit"
-              className="bg-primary text-secondary p-2 rounded-r-lg hover:bg-primary-dark transition-colors"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <FaSpinner className="animate-spin" />
-              ) : (
-                <FaPaperPlane />
-              )}
-            </button>
           </div>
-        </form>
+        ))}
+        <div ref={messagesEndRef} />
       </div>
-    </ProtectedRoute>
+      <form onSubmit={handleSendMessage} className="p-4 bg-background-alt">
+        <div className="flex items-center">
+          <input
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            placeholder="Type your message here..."
+            className="flex-1 p-2 rounded-l-lg border border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+            disabled={isLoading}
+          />
+          <button
+            type="submit"
+            className="bg-primary text-secondary p-2 rounded-r-lg hover:bg-primary-dark transition-colors"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <FaSpinner className="animate-spin" />
+            ) : (
+              <FaPaperPlane />
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <AuthProvider>
+      <ChatPageContent />
+    </AuthProvider>
   );
 }
