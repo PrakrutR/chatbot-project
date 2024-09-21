@@ -106,22 +106,17 @@ export default function ChatContent() {
         <div className="h-full overflow-y-auto px-4 py-6">
           <div className="max-w-3xl mx-auto">
             {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`mb-4 ${
-                  message.role === 'user' ? 'text-right' : 'text-left'
-                }`}
-              >
-                <div
-                  className={`inline-block p-3 rounded-lg ${
-                    message.role === 'user'
-                      ? 'bg-primary bg-opacity-80 text-secondary'
-                      : 'bg-secondary bg-opacity-80 text-text-primary'
-                  }`}
-                >
-                  <p className="text-center justify-center">
-                    {message.message}
-                  </p>
+              <div key={message.id} className="mb-4 flex justify-center">
+                <div className="w-4/5">
+                  <div
+                    className={`p-3 rounded-lg ${
+                      message.role === 'user'
+                        ? 'bg-primary bg-opacity-80 text-secondary'
+                        : 'bg-secondary bg-opacity-80 text-text-primary'
+                    }`}
+                  >
+                    <p className="text-left">{message.message}</p>
+                  </div>
                 </div>
               </div>
             ))}
