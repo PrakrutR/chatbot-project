@@ -1,7 +1,7 @@
 // src/app/dashboard/chat/page.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -21,22 +21,12 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (user) {
-      loadMessages();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const loadMessages = async () => {
-    if (!supabase) return;
+  const loadMessages = useCallback(async () => {
+    if (!user) return;
     const { data, error } = await supabase
       .from('messages')
       .select('*')
-      .eq('user_id', user?.id)
+      .eq('user_id', user.id)
       .order('timestamp', { ascending: true });
 
     if (error) {
@@ -44,7 +34,13 @@ export default function ChatPage() {
     } else {
       setMessages(data || []);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadMessages();
+    }
+  }, [user, loadMessages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
