@@ -1,7 +1,7 @@
 // src/components/ChatContent.tsx
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from './AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { FaPaperPlane, FaSpinner } from 'react-icons/fa';
@@ -40,6 +40,10 @@ export default function ChatContent() {
       loadMessages();
     }
   }, [user, loadMessages]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,59 +85,73 @@ export default function ChatContent() {
   };
 
   if (loading) {
-    return <div>Loading auth state...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading auth state...
+      </div>
+    );
   }
 
   if (!user) {
-    return <div>Please log in to access the chat.</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Please log in to access the chat.
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background">
-      <div className="flex-1 overflow-y-auto p-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`mb-4 ${
-              message.role === 'user' ? 'text-right' : 'text-left'
-            }`}
-          >
-            <div
-              className={`inline-block p-2 rounded-lg ${
-                message.role === 'user'
-                  ? 'bg-primary text-secondary'
-                  : 'bg-secondary text-text-primary'
-              }`}
-            >
-              {message.message}
-            </div>
+    <div className="flex flex-col h-screen bg-gray-100">
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto px-4 py-6">
+          <div className="max-w-3xl mx-auto">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`mb-4 ${
+                  message.role === 'user' ? 'text-right' : 'text-left'
+                }`}
+              >
+                <div
+                  className={`inline-block p-3 rounded-lg ${
+                    message.role === 'user'
+                      ? 'bg-blue-500 bg-opacity-80 text-white'
+                      : 'bg-gray-300 bg-opacity-80 text-gray-800'
+                  }`}
+                >
+                  {message.message}
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
           </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-      <form onSubmit={handleSendMessage} className="p-4 bg-background-alt">
-        <div className="flex items-center">
-          <input
-            type="text"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Type your message here..."
-            className="flex-1 p-2 rounded-l-lg border border-primary focus:outline-none focus:ring-2 focus:ring-primary"
-            disabled={isLoading}
-          />
-          <button
-            type="submit"
-            className="bg-primary text-secondary p-2 rounded-r-lg hover:bg-primary-dark transition-colors"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <FaSpinner className="animate-spin" />
-            ) : (
-              <FaPaperPlane />
-            )}
-          </button>
         </div>
-      </form>
+      </div>
+      <div className="bg-white border-t border-gray-200 px-4 py-4">
+        <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto">
+          <div className="flex items-center">
+            <input
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Type your message here..."
+              className="flex-1 p-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isLoading}
+            />
+            <button
+              type="submit"
+              className="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 transition-colors"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <FaSpinner className="animate-spin" />
+              ) : (
+                <FaPaperPlane />
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
