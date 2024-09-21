@@ -6,7 +6,7 @@ import { supabase } from '../../lib/supabase';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
-import TurnstileComponent from '../../components/Turnstile';
+import { TurnstileComponent, TurnstileRef } from '../../components/Turnstile';
 
 const passwordStrengthText = ['Weak', 'Fair', 'Good', 'Strong'];
 const passwordStrengthColor = [
@@ -49,7 +49,7 @@ export default function Signup() {
   };
 
   const resetCaptcha = () => {
-    if (turnstileRef.current && turnstileRef.current.reset) {
+    if (turnstileRef.current) {
       turnstileRef.current.reset();
     }
     setCaptchaToken(null);
@@ -111,8 +111,10 @@ export default function Signup() {
         setPassword('');
         setConfirmPassword('');
       }
-    } catch (error: any) {
-      setError(error.message || 'An unexpected error occurred');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unexpected error occurred';
+      setError(errorMessage);
       resetCaptcha();
     } finally {
       setIsLoading(false);

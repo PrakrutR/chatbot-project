@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { TurnstileComponent } from '../../components/Turnstile';
+import { TurnstileComponent, TurnstileRef } from '../../components/Turnstile';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -17,10 +17,10 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const router = useRouter();
-  const turnstileRef = useRef<any>(null);
+  const turnstileRef = useRef<TurnstileRef>(null);
 
   const resetCaptcha = () => {
-    if (turnstileRef.current && turnstileRef.current.reset) {
+    if (turnstileRef.current) {
       turnstileRef.current.reset();
     }
     setCaptchaToken(null);
@@ -55,8 +55,10 @@ export default function Login() {
       }
 
       router.push('/dashboard');
-    } catch (error: any) {
-      setError(error.message || 'An unexpected error occurred');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unexpected error occurred';
+      setError(errorMessage);
       resetCaptcha();
     } finally {
       setIsLoading(false);
