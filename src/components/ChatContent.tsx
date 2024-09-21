@@ -101,7 +101,7 @@ export default function ChatContent() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className="flex flex-col h-screen bg-background">
       <div className="flex-1 overflow-hidden">
         <div className="h-full overflow-y-auto px-4 py-6">
           <div className="max-w-3xl mx-auto">
@@ -115,11 +115,13 @@ export default function ChatContent() {
                 <div
                   className={`inline-block p-3 rounded-lg ${
                     message.role === 'user'
-                      ? 'bg-blue-500 bg-opacity-80 text-white'
-                      : 'bg-gray-300 bg-opacity-80 text-gray-800'
+                      ? 'bg-primary bg-opacity-80 text-secondary'
+                      : 'bg-secondary bg-opacity-80 text-text-primary'
                   }`}
                 >
-                  {message.message}
+                  <p className="text-center justify-center">
+                    {message.message}
+                  </p>
                 </div>
               </div>
             ))}
@@ -127,7 +129,7 @@ export default function ChatContent() {
           </div>
         </div>
       </div>
-      <div className="bg-white border-t border-gray-200 px-4 py-4">
+      <div className="bg-background-alt border-t border-primary px-4 py-4">
         <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto">
           <div className="flex items-center">
             <input
@@ -135,12 +137,12 @@ export default function ChatContent() {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Type your message here..."
-              className="flex-1 p-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 p-2 rounded-l-lg border border-primary focus:outline-none focus:ring-2 focus:ring-primary-light"
               disabled={isLoading}
             />
             <button
               type="submit"
-              className="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 transition-colors"
+              className="bg-primary text-secondary p-2 rounded-r-lg hover:bg-primary-dark transition-colors"
               disabled={isLoading}
             >
               {isLoading ? (
