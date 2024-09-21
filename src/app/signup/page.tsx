@@ -27,7 +27,7 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const turnstileRef = useRef<any>(null);
+  const turnstileRef = useRef<TurnstileRef>(null);
 
   useEffect(() => {
     checkPasswordStrength(password);
@@ -111,7 +111,7 @@ export default function Signup() {
         setPassword('');
         setConfirmPassword('');
       }
-    } catch (error: unknown) {
+    } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'An unexpected error occurred';
       setError(errorMessage);
