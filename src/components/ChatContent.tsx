@@ -1,11 +1,10 @@
-// src/components/ChatContent.tsx
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { FaPaperPlane, FaSpinner } from 'react-icons/fa';
-import { AuthProvider } from '@/components/AuthProvider';
+import AuthProvider from '@/components/AuthProvider';
 
 interface Message {
   id: string;

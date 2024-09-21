@@ -11,10 +11,6 @@ const nextConfig = {
       },
     ];
   },
-  // Add this configuration to exclude the chat page from static generation
-  experimental: {
-    excludePages: ['/dashboard/chat'],
-  },
 };
 
 module.exports = nextConfig;

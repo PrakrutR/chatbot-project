@@ -1,17 +1,72 @@
-// src/app/dashboard/chat/page.tsx
+// src/components/AuthProvider.tsx
 'use client';
 
-import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 
-const DynamicChatContent = dynamic(() => import('@/components/ChatContent'), {
-  ssr: false,
+type AuthContextType = {
+  user: User | null;
+  session: Session | null;
+  loading: boolean;
+};
+
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  session: null,
+  loading: true,
 });
 
-export default function ChatPage() {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const setData = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+        if (error) throw error;
+        setSession(session);
+        setUser(session?.user ?? null);
+      } catch (error) {
+        console.error('Error getting auth session:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (_event: AuthChangeEvent, session: Session | null) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    setData();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <DynamicChatContent />
-    </Suspense>
+    <AuthContext.Provider value={{ user, session, loading }}>
+      {children}
+    </AuthContext.Provider>
   );
-}
+};
+
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
+
+export default AuthProvider;
