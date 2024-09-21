@@ -27,30 +27,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const setData = async () => {
-      const {
-        data: { session },
-        error,
-      } = await (supabase as SupabaseClient).auth.getSession();
-      if (error) console.log(error);
-      else {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+        if (error) throw error;
         setSession(session);
         setUser(session?.user ?? null);
+      } catch (error) {
+        console.error('Error getting auth session:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     const {
       data: { subscription },
-    } = (supabase as SupabaseClient).auth.onAuthStateChange(
+    } = supabase.auth.onAuthStateChange(
       (_event: AuthChangeEvent, session: Session | null) => {
         setSession(session);
         setUser(session?.user ?? null);
+        setLoading(false);
       }
     );
 
     setData();
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
