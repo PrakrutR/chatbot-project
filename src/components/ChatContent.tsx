@@ -9,7 +9,7 @@ import { FaPaperPlane, FaSpinner } from 'react-icons/fa';
 interface Message {
   id: string;
   role: 'user' | 'assistant';
-  content: string;
+  message: string;
   timestamp: Date;
 }
 
@@ -41,14 +41,6 @@ export default function ChatContent() {
     }
   }, [user, loadMessages]);
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
-
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || !user) return;
@@ -57,7 +49,7 @@ export default function ChatContent() {
     const newMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputMessage.trim(),
+      message: inputMessage.trim(),
       timestamp: new Date(),
     };
 
@@ -70,7 +62,7 @@ export default function ChatContent() {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `I received your message: "${inputMessage.trim()}"`,
+        message: `I received your message: "${inputMessage.trim()}"`,
         timestamp: new Date(),
       };
       setMessages((prevMessages) => [...prevMessages, assistantMessage]);
@@ -82,7 +74,7 @@ export default function ChatContent() {
       {
         user_id: user.id,
         role: newMessage.role,
-        content: newMessage.content,
+        message: newMessage.message,
         timestamp: newMessage.timestamp,
       },
     ]);
@@ -98,9 +90,6 @@ export default function ChatContent() {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <header className="bg-primary text-secondary p-4">
-        <h1 className="text-2xl font-bold">AI Chatbot</h1>
-      </header>
       <div className="flex-1 overflow-y-auto p-4">
         {messages.map((message) => (
           <div
@@ -116,7 +105,7 @@ export default function ChatContent() {
                   : 'bg-secondary text-text-primary'
               }`}
             >
-              {message.content}
+              {message.message}
             </div>
           </div>
         ))}
