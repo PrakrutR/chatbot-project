@@ -7,32 +7,46 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import TurnstileComponent from '../../components/Turnstile';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
+
+    if (!captchaToken) {
+      setError('Please complete the captcha');
+      setIsLoading(false);
+      return;
+    }
+
     if (!supabase) {
       console.error('Supabase client is not initialized');
       setIsLoading(false);
       return;
     }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
+      options: {
+        captchaToken: captchaToken,
+      },
     });
+
     if (error) {
       setError(error.message);
     } else {
-      router.push('/dashboard/chat');
+      router.push('/dashboard');
     }
     setIsLoading(false);
   };
@@ -103,6 +117,10 @@ export default function Login() {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
+          </div>
+          {error && <p className="text-accent text-xs italic mb-4">{error}</p>}
+          <div className="mb-6">
+            <TurnstileComponent onVerify={(token) => setCaptchaToken(token)} />
           </div>
           {error && <p className="text-accent text-xs italic mb-4">{error}</p>}
           <div className="flex items-center justify-between mb-6">

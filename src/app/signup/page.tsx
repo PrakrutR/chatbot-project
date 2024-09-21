@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import TurnstileComponent from '../../components/Turnstile';
 
 const passwordStrengthText = ['Weak', 'Fair', 'Good', 'Strong'];
 const passwordStrengthColor = [
@@ -25,6 +26,7 @@ export default function Signup() {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   useEffect(() => {
     checkPasswordStrength(password);
@@ -50,6 +52,12 @@ export default function Signup() {
     setError('');
     setMessage('');
     setIsLoading(true);
+
+    if (!captchaToken) {
+      setError('Please complete the captcha');
+      setIsLoading(false);
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords don't match");
@@ -79,6 +87,7 @@ export default function Signup() {
         data: {
           display_name: displayName,
         },
+        captchaToken: captchaToken,
       },
     });
 
@@ -223,6 +232,15 @@ export default function Signup() {
           {message && (
             <p className="text-green-500 text-xs italic mb-4">{message}</p>
           )}
+          <div className="mb-6">
+            <TurnstileComponent onVerify={(token) => setCaptchaToken(token)} />
+          </div>
+
+          {error && <p className="text-accent text-xs italic mb-4">{error}</p>}
+          {message && (
+            <p className="text-green-500 text-xs italic mb-4">{message}</p>
+          )}
+
           <div className="flex items-center justify-between mb-6">
             <button
               className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
