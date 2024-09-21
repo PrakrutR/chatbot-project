@@ -1,7 +1,7 @@
 // src/components/Turnstile.tsx
 'use client';
 
-import { Turnstile, TurnstileProps } from '@marsidev/react-turnstile';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 interface TurnstileComponentProps {
   onVerify: (token: string) => void;
