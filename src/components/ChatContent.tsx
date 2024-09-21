@@ -2,10 +2,9 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useAuth } from '@/components/AuthProvider';
+import { useAuth } from './AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { FaPaperPlane, FaSpinner } from 'react-icons/fa';
-import AuthProvider from '@/components/AuthProvider';
 
 interface Message {
   id: string;
@@ -14,7 +13,7 @@ interface Message {
   timestamp: Date;
 }
 
-function ChatPageContent() {
+export default function ChatContent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -147,13 +146,5 @@ function ChatPageContent() {
         </div>
       </form>
     </div>
-  );
-}
-
-export default function ChatContent() {
-  return (
-    <AuthProvider>
-      <ChatPageContent />
-    </AuthProvider>
   );
 }
