@@ -29,6 +29,22 @@ export default function Login() {
       return;
     }
 
+    const verificationResponse = await fetch('/api/verify-turnstile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token: captchaToken }),
+    });
+
+    const verificationResult = await verificationResponse.json();
+
+    if (!verificationResult.success) {
+      setError('Captcha verification failed. Please try again.');
+      setIsLoading(false);
+      return;
+    }
+
     if (!supabase) {
       console.error('Supabase client is not initialized');
       setIsLoading(false);
